@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="lib" path="F:/java_lib/httpcomponents-client-4.2.3/lib/httpclient-4.2.3.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/F:/java_lib/httpcomponents-client-4.2.3/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="F:/java_lib/httpcomponents-client-4.2.3/lib/httpcore-4.2.2.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/F:/java_lib/httpcomponents-client-4.2.3/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="F:/java_lib/JSON-java" sourcepath="F:/java_lib/JSON-java">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/F:/java_lib/JSON-java/doc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="F:/java_lib/jsoup/jsoup-1.7.2.jar" sourcepath="F:/java_lib/jsoup/jsoup-1.7.2-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/F:/java_lib/jsoup/jsoup-1.7.2-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
