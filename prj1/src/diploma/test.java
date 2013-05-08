@@ -1,7 +1,7 @@
-package prj1;
+package diploma;
 public class test {
 	public static void main(String[] args) throws Exception {
-		System.out.println("Something changed.");
+		System.out.println("Something again.");
 	}
 
 }

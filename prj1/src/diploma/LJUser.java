@@ -1,4 +1,4 @@
-package prj1;
+package diploma;
 
 import java.io.IOException;
 import java.sql.Connection;

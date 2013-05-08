@@ -1,4 +1,4 @@
-package prj1;
+package diploma;
 
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;

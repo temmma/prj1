@@ -1,4 +1,4 @@
-package prj1;
+package diploma;
 
 import java.io.File;
 import java.io.PrintWriter;
