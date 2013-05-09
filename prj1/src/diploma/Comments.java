@@ -70,7 +70,7 @@ public class Comments {
     }
    
     JSONArray retrieveJson(String url) throws Exception{
-//    	Возвращает массив с комментариями из страницы по адресу url
+//    	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ url
         HttpClient   httpclnt = new DefaultHttpClient();
         HttpGet       httpget = new HttpGet(url);      
         HttpResponse httpresp = httpclnt.execute(httpget);
@@ -86,8 +86,8 @@ public class Comments {
     }
     
 //    /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ NEW BLOCK
-    void retrieveComments(JSONArray initial) throws Exception{
-//    	Принимает набор первоначальных комментариев, открывает все 1е уровни, грузит из них комменты
+    void getFirstLevelList(JSONArray initial) throws Exception{
+//    	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ 1пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     	String href = "";
     	ArrayList<String> localKeys = null;
     	System.out.println(initial.length());
@@ -145,8 +145,8 @@ public class Comments {
     
     
     void JSON2File(JSONArray initial) throws Exception{
-    	ArrayList<String> localKeys = new ArrayList<String>(Arrays.asList("username,article,level".split(",")));    	
-        File out_file = new File("D:\\aovodov\\tmp\\20130509\\tema1368645_thread"+number++ +".comments");
+    	ArrayList<String> localKeys = new ArrayList<String>(Arrays.asList("username,article,level,collapsed".split(",")));    	
+        File out_file = new File("D:\\aovodov\\tmp\\20130509\\1398900"+number++ +".comments");
         PrintWriter out = new PrintWriter(out_file);
 
     	for (int i=0; i<initial.length(); i++){
@@ -173,11 +173,12 @@ public class Comments {
     
     public static void main(String[] args) throws Exception {
         Comments t = new Comments();
-        for (int i=1; i<4; i++){
-        	t.retrieveComments(t.retrieveJson("http://tema.livejournal.com/1398900.html?page="+i+"&format=light"));
-        	System.out.println("http://tema.livejournal.com/1398900.html?page="+i+"&format=light");
-        	System.out.println(new Date());	
-        }
+        t.JSON2File(t.retrieveJson("http://tema.livejournal.com/1398900.html?&format=light"));
+//        for (int i=1; i<4; i++){
+//        	t.getFirstLevelList(t.retrieveJson("http://tema.livejournal.com/1398900.html?page="+i+"&format=light"));
+//        	System.out.println("http://tema.livejournal.com/1398900.html?page="+i+"&format=light");
+//        	System.out.println(new Date());	
+//        }
     	File out_file = new File("D:\\aovodov\\tmp\\20130509\\tema1398900.comments");
         PrintWriter out = new PrintWriter(out_file);        
     	for (Comment aComment:t.commentList)
