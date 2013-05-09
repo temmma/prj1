@@ -70,7 +70,7 @@ public class Comments {
     }
    
     JSONArray retrieveJson(String url) throws Exception{
-//    	���������� ������ � ������������� �� �������� �� ������ url
+//    	Возвращает массив с комментариями из страницы по адресу url
         HttpClient   httpclnt = new DefaultHttpClient();
         HttpGet       httpget = new HttpGet(url);      
         HttpResponse httpresp = httpclnt.execute(httpget);
@@ -87,7 +87,7 @@ public class Comments {
     
 //    /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ NEW BLOCK
     void getFirstLevelList(JSONArray initial) throws Exception{
-//    	��������� ����� �������������� ������������, ��������� ��� 1� ������, ������ �� ��� ��������
+//    	Принимает набор первоначальных комментариев, открывает все 1е уровни, грузит из них комменты
     	String href = "";
     	ArrayList<String> localKeys = null;
     	System.out.println(initial.length());
