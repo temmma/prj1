@@ -18,15 +18,17 @@ import org.jsoup.select.Elements;
 
 class Comment{
 	String expand_url;
-	long thread;
-	long parent;
 	String ctime;
 	String article;
-	int level;
+	String username;
+	long thread;
+	long parent;
+	 int level;
 	boolean collapsed;
 	
-	public Comment(String journal_url, long thread, long parent, String ctime, String article, int level){
-		this.expand_url = journal_url;
+	public Comment(String username, long thread, long parent, String ctime, String article, int level){
+		this.username = username;
+		this.expand_url = "";
 		this.thread = thread;
 		this.parent = parent;
 		this.ctime = ctime;
@@ -142,11 +144,59 @@ public class Comments {
 
     
     void makeList(JSONArray input){
+    	String expand_url = "";
+    	String ctime;
+    	String article;
+    	String username;
+    	long thread;
+    	long parent;
+    	 int level;
     	
+    	List<Comment> tmpFull = new ArrayList<Comment>();
+    	List<Comment> tmpLink = new ArrayList<Comment>();
+    	for (int i=0; i<input.length(); i++){
+    		JSONObject first_level = input.getJSONObject(i);
+    		String[] aNames = JSONObject.getNames(first_level);
+    		if (Arrays.binarySearch(aNames, "moreusers") < -1) continue;
+    		if (tmpFull.isEmpty() & Integer.parseInt(JSONObject.valueToString(first_level.get("collapsed"))) == 1) continue;
+//    		Проверили необходимость сохранения текущего комментария
+			ctime 	=                  JSONObject.valueToString(first_level.get("ctime"));
+			article = 				   JSONObject.valueToString(first_level.get("article"));
+			thread 	=   Long.parseLong(JSONObject.valueToString(first_level.get("thread")));
+			parent 	=   Long.parseLong(JSONObject.valueToString(first_level.get("parent")));
+			level   = Integer.parseInt(JSONObject.valueToString(first_level.get("level")));
+//    		Сохранили все данные из первого уровня
+			JSONObject usernameJson = first_level.getJSONArray("username").getJSONObject(0);
+			username = JSONObject.valueToString(usernameJson.get("journal_url"));
+//			Сохранили название журнала из второго
+			JSONArray actionsArray = first_level.getJSONArray("actions");
+    		for (int j=0; j<actionsArray.length(); j++){
+    			JSONObject tmp = actionsArray.getJSONObject(j);
+    			if (JSONObject.valueToString(tmp.get("name")).equals("\"expand\""))
+    				expand_url = tmp.getString("href");
+    		}
+//			Извлекли ссылку из внутреннего массива
+    		tmpFull.add(new Comment(username, thread, parent, ctime, article, level));
+    		tmpLink.add(new Comment(expand_url));
+    		System.out.println(tmpFull.size()-1 + " -- tmpFull "+tmpFull.get(tmpFull.size()-1));
+    		System.out.print("tmpLink "+tmpLink.get(tmpLink.size()-1));
+    		System.out.println(", collapsed: "+JSONObject.valueToString(first_level.get("collapsed")));
+    		if (Integer.parseInt(JSONObject.valueToString(first_level.get("collapsed"))) == 1){
+//    			Текущая ветка скрыта, поднимаемся на 2 уровня выше
+    			for (int j = 0; j < tmpFull.size()-3; j++)
+    				commentList.add(tmpFull.get(j));
+    			commentList.add(tmpLink.get(tmpLink.size()-3));
+    			tmpFull.clear();
+    			tmpLink.clear();
+    		} else
+    		if (i==input.length()-1)
+    			commentList.addAll(tmpFull);
+//    			дошли до конца и не свернуто
+    	}
     }   
     
     void Json2File(JSONArray initial) throws Exception{
-    	List<String> localKeys = new ArrayList<String>(Arrays.asList("username,article,level,collapsed".split(",")));    	
+    	List<String> localKeys = new ArrayList<String>(Arrays.asList("username,article,level,collapsed".split(",")));
 //        File out_file = new File("D:\\aovodov\\tmp\\20130509\\1398900"+number++ +".comments");
     	File out_file = new File("D:\\aovodov\\tmp\\20130509\\1398900_primer.comments");
         PrintWriter out = new PrintWriter(out_file);
@@ -155,18 +205,20 @@ public class Comments {
     		out.println("-----------------------------------------------New Comment #"+(i+1));
     		JSONObject first_level = initial.getJSONObject(i);
     		for(String aName:JSONObject.getNames(first_level)){
-//    			if (!localKeys.contains(aName)) continue;    			
+    			if (aName.equals("leafclass")) continue;
+//    			if (!localKeys.contains(aName)) continue;
     			Object obj = first_level.get(aName);
     			if (obj.getClass() == JSONArray.class){
+    				out.println("\n"+aName+":");
 					JSONArray tmp = first_level.getJSONArray(aName);
 					for (int j = 0; j < tmp.length(); j++) {
 						JSONObject second_level = tmp.getJSONObject(j);
 						for(String bName:JSONObject.getNames(second_level)){
 							out.println("  "+bName+": "+JSONObject.valueToString(second_level.get(bName)));
 						}
-					}    				
+					}
     			} else {
-					out.println(aName+": "+JSONObject.valueToString(first_level.get(aName)));					    				
+					out.println(aName+": "+JSONObject.valueToString(first_level.get(aName)));
     			}
     		}
     	}
@@ -175,13 +227,13 @@ public class Comments {
     
     public static void main(String[] args) throws Exception {
         Comments t = new Comments();
-        t.Json2File(t.retrieveJson("http://tema.livejournal.com/1398900.html?&format=light"));
+        t.makeList(t.retrieveJson("http://tema.livejournal.com/1399594.html?&format=light"));
 //        for (int i=1; i<4; i++){
 //        	t.getFirstLevelList(t.retrieveJson("http://tema.livejournal.com/1398900.html?page="+i+"&format=light"));
 //        	System.out.println("http://tema.livejournal.com/1398900.html?page="+i+"&format=light");
 //        	System.out.println(new Date());	
 //        }
-    	File out_file = new File("D:\\aovodov\\tmp\\20130509\\tema1398900.comments");
+    	File out_file = new File("D:\\aovodov\\tmp\\20130509\\tema1399594.comments");
         PrintWriter out = new PrintWriter(out_file);        
     	for (Comment aComment:t.commentList)
     		out.println(aComment);
