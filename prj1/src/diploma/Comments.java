@@ -2,9 +2,7 @@ package diploma;
 
 import java.io.File;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
+import java.util.*;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -19,7 +17,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 class Comment{
-	String journal_url;
+	String expand_url;
 	long thread;
 	long parent;
 	String ctime;
@@ -28,7 +26,7 @@ class Comment{
 	boolean collapsed;
 	
 	public Comment(String journal_url, long thread, long parent, String ctime, String article, int level){
-		this.journal_url = journal_url;
+		this.expand_url = journal_url;
 		this.thread = thread;
 		this.parent = parent;
 		this.ctime = ctime;
@@ -38,13 +36,13 @@ class Comment{
 	}
 	
 	public Comment(String threadURL){
-		this.journal_url = threadURL;
+		this.expand_url = threadURL;
 		this.collapsed = true;
 	}
 	
 	public String toString(){
 		String blink = "";
-		if (collapsed) return journal_url;
+		if (collapsed) return expand_url;
 		for (int i=0; i*2<level; i++)
 			blink += " ";
 		return blink+article;
@@ -58,10 +56,10 @@ class Comment{
 
 public class Comments {
 	
-    ArrayList<String> keys;
+    List<Comment> commentList;
+    List<String> keys;
+    List<String> linkList;
     int number = 0;
-    ArrayList<Comment> commentList;
-    ArrayList<String> linkList;
     
     public Comments() throws Exception{
                keys = new ArrayList<String>(Arrays.asList("journal_url,thread,parent,ctime,article,level,leafclass".split(",")));
@@ -69,27 +67,11 @@ public class Comments {
            linkList = new ArrayList<String>();
     }
    
-    JSONArray retrieveJson(String url) throws Exception{
-//    	Возвращает массив с комментариями из страницы по адресу url
-        HttpClient   httpclnt = new DefaultHttpClient();
-        HttpGet       httpget = new HttpGet(url);      
-        HttpResponse httpresp = httpclnt.execute(httpget);
-        HttpEntity     entity = httpresp.getEntity();
-        String 		html_text = new String();
-        if (entity != null)
-            html_text = EntityUtils.toString(entity, "UTF-8");
-        httpget.abort();
-        
-        Document  		  doc = Jsoup.parse(html_text,"UTF-8");       
-        Elements 	 comments = doc.getElementsByAttributeValue("id", "comments_json");
-        return new JSONArray(comments.html());
-    }
-    
 //    /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ NEW BLOCK
     void getFirstLevelList(JSONArray initial) throws Exception{
 //    	Принимает набор первоначальных комментариев, открывает все 1е уровни, грузит из них комменты
     	String href = "";
-    	ArrayList<String> localKeys = null;
+    	List<String> localKeys = null;
     	System.out.println(initial.length());
     	for (int i = 0; i < initial.length(); i++) {
         		JSONObject currentComment = initial.getJSONObject(i);
@@ -101,7 +83,7 @@ public class Comments {
         		href = simpleCheck(currentComment.get("actions"));
         		if (!href.equals("")){
         			getComments(retrieveJson(href));
-                	  JSON2File(retrieveJson(href));
+                	  Json2File(retrieveJson(href));
         		}
 		}
     }
@@ -140,20 +122,40 @@ public class Comments {
 			}
 		}
     }
+//  \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ TRash BLOCK
     
-//    \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ NEW BLOCK
+    JSONArray retrieveJson(String url) throws Exception{
+//    	Возвращает массив с комментариями из страницы по адресу url
+        HttpClient   httpclnt = new DefaultHttpClient();
+        HttpGet       httpget = new HttpGet(url);      
+        HttpResponse httpresp = httpclnt.execute(httpget);
+        HttpEntity     entity = httpresp.getEntity();
+        String 		html_text = new String();
+        if (entity != null)
+            html_text = EntityUtils.toString(entity, "UTF-8");
+        httpget.abort();
+        
+        Document  		  doc = Jsoup.parse(html_text,"UTF-8");       
+        Elements 	 comments = doc.getElementsByAttributeValue("id", "comments_json");
+        return new JSONArray(comments.html());
+    }
+
     
+    void makeList(JSONArray input){
+    	
+    }   
     
-    void JSON2File(JSONArray initial) throws Exception{
-    	ArrayList<String> localKeys = new ArrayList<String>(Arrays.asList("username,article,level,collapsed".split(",")));    	
-        File out_file = new File("D:\\aovodov\\tmp\\20130509\\1398900"+number++ +".comments");
+    void Json2File(JSONArray initial) throws Exception{
+    	List<String> localKeys = new ArrayList<String>(Arrays.asList("username,article,level,collapsed".split(",")));    	
+//        File out_file = new File("D:\\aovodov\\tmp\\20130509\\1398900"+number++ +".comments");
+    	File out_file = new File("D:\\aovodov\\tmp\\20130509\\1398900_primer.comments");
         PrintWriter out = new PrintWriter(out_file);
 
     	for (int i=0; i<initial.length(); i++){
     		out.println("-----------------------------------------------New Comment #"+(i+1));
     		JSONObject first_level = initial.getJSONObject(i);
     		for(String aName:JSONObject.getNames(first_level)){
-    			if (!localKeys.contains(aName)) continue;    			
+//    			if (!localKeys.contains(aName)) continue;    			
     			Object obj = first_level.get(aName);
     			if (obj.getClass() == JSONArray.class){
 					JSONArray tmp = first_level.getJSONArray(aName);
@@ -173,7 +175,7 @@ public class Comments {
     
     public static void main(String[] args) throws Exception {
         Comments t = new Comments();
-        t.JSON2File(t.retrieveJson("http://tema.livejournal.com/1398900.html?&format=light"));
+        t.Json2File(t.retrieveJson("http://tema.livejournal.com/1398900.html?&format=light"));
 //        for (int i=1; i<4; i++){
 //        	t.getFirstLevelList(t.retrieveJson("http://tema.livejournal.com/1398900.html?page="+i+"&format=light"));
 //        	System.out.println("http://tema.livejournal.com/1398900.html?page="+i+"&format=light");
