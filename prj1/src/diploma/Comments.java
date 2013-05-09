@@ -70,21 +70,24 @@ public class Comments {
     }
    
     JSONArray retrieveJson(String url) throws Exception{
-        HttpClient httpclnt = new DefaultHttpClient();
-        HttpGet httpget = new HttpGet(url);
-        
+//    	Возвращает массив с комментариями из страницы по адресу url
+        HttpClient   httpclnt = new DefaultHttpClient();
+        HttpGet       httpget = new HttpGet(url);      
         HttpResponse httpresp = httpclnt.execute(httpget);
-        HttpEntity entity = httpresp.getEntity();
-        String html_text = new String();
+        HttpEntity     entity = httpresp.getEntity();
+        String 		html_text = new String();
         if (entity != null)
             html_text = EntityUtils.toString(entity, "UTF-8");
-        Document doc = Jsoup.parse(html_text,"UTF-8");       
-        Elements temp = doc.getElementsByAttributeValue("id", "comments_json");
         httpget.abort();
-        return new JSONArray(temp.html());
+        
+        Document  		  doc = Jsoup.parse(html_text,"UTF-8");       
+        Elements 	 comments = doc.getElementsByAttributeValue("id", "comments_json");
+        return new JSONArray(comments.html());
     }
+    
 //    /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ NEW BLOCK
-    void retrieveComments2(JSONArray initial) throws Exception{
+    void retrieveComments(JSONArray initial) throws Exception{
+//    	Принимает набор первоначальных комментариев, открывает все 1е уровни, грузит из них комменты
     	String href = "";
     	ArrayList<String> localKeys = null;
     	System.out.println(initial.length());
@@ -102,7 +105,6 @@ public class Comments {
         		}
 		}
     }
-    
     String simpleCheck(Object toCheck){
     	if (toCheck.getClass().equals(JSONArray.class)){
     		JSONArray ttt = (JSONArray) toCheck;
@@ -141,62 +143,10 @@ public class Comments {
     
 //    \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ NEW BLOCK
     
-    void retrieveComments(boolean skipFirst, JSONArray initial) throws Exception{
-    	String journal_url;
-    	long thread;
-    	long parent;
-    	String ctime;
-    	String article;
-    	int level;
-    	int i = 0;
-    	boolean linked = false;
-    	
-    	while(i < initial.length()){
-    		JSONObject first_level = initial.getJSONObject(i);
-    		ArrayList<String> localKeys = new ArrayList<String>(Arrays.asList(JSONObject.getNames(first_level)));
-    		if (!localKeys.contains("moreusers") & !localKeys.contains("more")){//!!!!!!!!!!ddddddddddAAAAAAAAAAAAAAAAA!!@!!
-    			if (JSONObject.valueToString(first_level.get("leafclass")).equals("null")){
-    				if (JSONObject.valueToString(first_level.get("username")).equals("null")) continue;
-        			thread 	= Long.parseLong(JSONObject.valueToString(first_level.get("thread")));
-        			parent 	= Long.parseLong(JSONObject.valueToString(first_level.get("parent")));
-        			ctime 	= JSONObject.valueToString(first_level.get("ctime"));
-        			article = JSONObject.valueToString(first_level.get("article"));
-        			level   = Integer.parseInt(JSONObject.valueToString(first_level.get("level")));
-        			JSONObject username = first_level.getJSONArray("username").getJSONObject(0);
-        			journal_url = JSONObject.valueToString(username.get("journal_url"));
-        			commentList.add(new Comment(journal_url, thread, parent, ctime, article, level));
-        			linked = false;
-        			i++;
-    			} else if (linked){
-    				// РїСЂРѕРјР°С‚С‹РІР°РµРј Р»РёС€РЅРёРµ, РїРѕС‚РѕРјСѓ С‡С‚Рѕ СЃСЃС‹Р»РєСѓ СѓР¶Рµ СѓСЃС‚Р°РЅРѕРІРёР»Рё
-    					i++;
-    			} else if (!linked && !skipFirst){
-    				if (JSONObject.valueToString(first_level.get("actions")).equals("null")) continue;
-    				// СЃРѕР·РґР°С‚СЊ РѕР±СЉРµРєС‚ СЃРѕ СЃСЃС‹Р»РєРѕР№ Рё РїСЂРѕРїСѓСЃС‚РёС‚СЊ РїСѓСЃС‚С‹Рµ РѕР±СЉРµРєС‚С‹
-    				JSONArray actions = first_level.getJSONArray("actions");
-    				for (int j=0; j<actions.length(); j++){
-    					JSONObject tmp = actions.getJSONObject(j);
-    					if (JSONObject.valueToString(tmp.get("name")).equals("\"expand\""))
-//    							System.out.println((tmp.getString("href")));
-    						retrieveComments(true, retrieveJson(tmp.getString("href")));
-//    						JSON2File(retrieveJson(tmp.getString("href")));
-//    						commentList.add(new Comment(tmp.getString("href")));
-//    							retrieveJson(tmp.getString("href"));
-    				}
-    				linked = true;
-    				i++;
-    			} else if (!linked && skipFirst){
-    				skipFirst = false;
-    				i++;
-    			}
-    		} else i++;    		
-    	}
-    }
     
     void JSON2File(JSONArray initial) throws Exception{
     	ArrayList<String> localKeys = new ArrayList<String>(Arrays.asList("username,article,level".split(",")));    	
         File out_file = new File("D:\\aovodov\\tmp\\20130509\\tema1368645_thread"+number++ +".comments");
-//    	File out_file = new File("D:\\aovodov\\tmp\\20130509\\tema1368153_.comments");
         PrintWriter out = new PrintWriter(out_file);
 
     	for (int i=0; i<initial.length(); i++){
@@ -207,8 +157,6 @@ public class Comments {
     			Object obj = first_level.get(aName);
     			if (obj.getClass() == JSONArray.class){
 					JSONArray tmp = first_level.getJSONArray(aName);
-//					out.println("["+aName+"]");
-					
 					for (int j = 0; j < tmp.length(); j++) {
 						JSONObject second_level = tmp.getJSONObject(j);
 						for(String bName:JSONObject.getNames(second_level)){
@@ -226,7 +174,7 @@ public class Comments {
     public static void main(String[] args) throws Exception {
         Comments t = new Comments();
         for (int i=1; i<4; i++){
-        	t.retrieveComments2(t.retrieveJson("http://tema.livejournal.com/1398900.html?page="+i+"&format=light"));
+        	t.retrieveComments(t.retrieveJson("http://tema.livejournal.com/1398900.html?page="+i+"&format=light"));
         	System.out.println("http://tema.livejournal.com/1398900.html?page="+i+"&format=light");
         	System.out.println(new Date());	
         }
