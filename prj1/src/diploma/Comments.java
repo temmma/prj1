@@ -239,13 +239,13 @@ public class Comments {
     
     public static void main(String[] args) throws Exception {
         Comments t = new Comments();
-        t.makeList(t.retrieveJson("http://tema.livejournal.com/1337569.html?&format=light"));
+        t.makeList(t.retrieveJson("http://dolboeb.livejournal.com/2510916.html?&format=light"));
 //        for (int i=1; i<4; i++){
 //        	t.getFirstLevelList(t.retrieveJson("http://tema.livejournal.com/1398900.html?page="+i+"&format=light"));
 //        	System.out.println("http://tema.livejournal.com/1398900.html?page="+i+"&format=light");
 //        	System.out.println(new Date());	
 //        }
-    	File out_file = new File("D:\\aovodov\\tmp\\20130509\\tema1337569.comments");
+    	File out_file = new File("D:\\aovodov\\tmp\\20130509\\dolboeb2510916.comments");
         PrintWriter out = new PrintWriter(out_file);        
     	for (Comment aComment:t.commentList)
     		out.println(aComment);
