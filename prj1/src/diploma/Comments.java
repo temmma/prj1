@@ -47,8 +47,11 @@ class Comment{
 		if (collapsed) return journal_url;
 		for (int i=0; i*2<level; i++)
 			blink += " ";
-//		return blink+journal_url+"\n"+blink+article;
 		return blink+article;
+	}
+	
+	public boolean equals(Object Obj){
+		return collapsed;		
 	}
 }
 
@@ -77,8 +80,6 @@ public class Comments {
             html_text = EntityUtils.toString(entity, "UTF-8");
         Document doc = Jsoup.parse(html_text,"UTF-8");       
         Elements temp = doc.getElementsByAttributeValue("id", "comments_json");
-//        System.out.println(html_text);
-//        parseJson(new JSONArray(temp.html()));
         httpget.abort();
         return new JSONArray(temp.html());
     }
@@ -194,8 +195,8 @@ public class Comments {
     
     void JSON2File(JSONArray initial) throws Exception{
     	ArrayList<String> localKeys = new ArrayList<String>(Arrays.asList("username,article,level".split(",")));    	
-        File out_file = new File("F:\\tmp\\20130401\\tema1368645_thread"+number++ +".comments");
-//    	File out_file = new File("F:\\tmp\\20130401\\tema1368153_.comments");
+        File out_file = new File("D:\\aovodov\\tmp\\20130509\\tema1368645_thread"+number++ +".comments");
+//    	File out_file = new File("D:\\aovodov\\tmp\\20130509\\tema1368153_.comments");
         PrintWriter out = new PrintWriter(out_file);
 
     	for (int i=0; i<initial.length(); i++){
@@ -224,12 +225,12 @@ public class Comments {
     
     public static void main(String[] args) throws Exception {
         Comments t = new Comments();
-        for (int i=1; i<8; i++){
-        	t.retrieveComments2(t.retrieveJson("http://tema.livejournal.com/1368645.html?page="+i+"&format=light"));
-        	System.out.println("http://tema.livejournal.com/1368645.html?page="+i+"&format=light");
+        for (int i=1; i<4; i++){
+        	t.retrieveComments2(t.retrieveJson("http://tema.livejournal.com/1398900.html?page="+i+"&format=light"));
+        	System.out.println("http://tema.livejournal.com/1398900.html?page="+i+"&format=light");
         	System.out.println(new Date());	
         }
-    	File out_file = new File("F:\\tmp\\20130401\\tema1368153_all.comments");
+    	File out_file = new File("D:\\aovodov\\tmp\\20130509\\tema1398900.comments");
         PrintWriter out = new PrintWriter(out_file);        
     	for (Comment aComment:t.commentList)
     		out.println(aComment);
