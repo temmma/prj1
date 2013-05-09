@@ -157,8 +157,20 @@ public class Comments {
     	for (int i=0; i<input.length(); i++){
     		JSONObject first_level = input.getJSONObject(i);
     		String[] aNames = JSONObject.getNames(first_level);
-    		if (Arrays.binarySearch(aNames, "moreusers") < -1) continue;
+    		if (Arrays.binarySearch(aNames, "moreusers") < -1) continue; //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     		if (tmpFull.isEmpty() & Integer.parseInt(JSONObject.valueToString(first_level.get("collapsed"))) == 1) continue;
+    		if (Integer.parseInt(JSONObject.valueToString(first_level.get("deleted"))) == 1){
+    			JSONObject usernameJson = first_level.getJSONArray("username").getJSONObject(0);
+    			username = JSONObject.valueToString(usernameJson.get("journal_url"));
+    			ctime 	= "February 14 1980, 00:00:00 UTC";
+    			article = "Deleted comment.";
+    			thread 	=   Long.parseLong(JSONObject.valueToString(first_level.get("thread")));
+    			parent 	=   Long.parseLong(JSONObject.valueToString(first_level.get("parent")));
+    			level   = Integer.parseInt(JSONObject.valueToString(first_level.get("level")));
+        		tmpFull.add(new Comment(username, thread, parent, ctime, article, level));
+        		tmpLink.add(new Comment("www.google.com"));
+        		continue;
+    		}
 //    		Проверили необходимость сохранения текущего комментария
 			ctime 	=                  JSONObject.valueToString(first_level.get("ctime"));
 			article = 				   JSONObject.valueToString(first_level.get("article"));
@@ -198,7 +210,7 @@ public class Comments {
     void Json2File(JSONArray initial) throws Exception{
     	List<String> localKeys = new ArrayList<String>(Arrays.asList("username,article,level,collapsed".split(",")));
 //        File out_file = new File("D:\\aovodov\\tmp\\20130509\\1398900"+number++ +".comments");
-    	File out_file = new File("D:\\aovodov\\tmp\\20130509\\1398900_primer.comments");
+    	File out_file = new File("D:\\aovodov\\tmp\\20130509\\1337569.comments");
         PrintWriter out = new PrintWriter(out_file);
 
     	for (int i=0; i<initial.length(); i++){
@@ -227,13 +239,13 @@ public class Comments {
     
     public static void main(String[] args) throws Exception {
         Comments t = new Comments();
-        t.makeList(t.retrieveJson("http://tema.livejournal.com/1399594.html?&format=light"));
+        t.makeList(t.retrieveJson("http://tema.livejournal.com/1337569.html?&format=light"));
 //        for (int i=1; i<4; i++){
 //        	t.getFirstLevelList(t.retrieveJson("http://tema.livejournal.com/1398900.html?page="+i+"&format=light"));
 //        	System.out.println("http://tema.livejournal.com/1398900.html?page="+i+"&format=light");
 //        	System.out.println(new Date());	
 //        }
-    	File out_file = new File("D:\\aovodov\\tmp\\20130509\\tema1399594.comments");
+    	File out_file = new File("D:\\aovodov\\tmp\\20130509\\tema1337569.comments");
         PrintWriter out = new PrintWriter(out_file);        
     	for (Comment aComment:t.commentList)
     		out.println(aComment);
