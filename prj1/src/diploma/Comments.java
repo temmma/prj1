@@ -50,8 +50,17 @@ class Comment{
 		return blink+article;
 	}
 	
+	@Override
 	public boolean equals(Object Obj){
-		return collapsed;		
+		Comment aComment = (Comment) Obj;
+		return (this.collapsed == aComment.collapsed);
+	}
+	
+	@Override
+	public int hashCode(){
+		int code = 1;
+		if (collapsed) code = 0;
+		return code;
 	}
 }
 
@@ -143,7 +152,7 @@ public class Comments {
     }
 
     
-    void makeList(JSONArray input){
+    List<Comment> initList(JSONArray input){
     	String expand_url = "";
     	String ctime;
     	String article;
@@ -151,7 +160,8 @@ public class Comments {
     	long thread;
     	long parent;
     	 int level;
-    	
+    	List<Comment> result = new ArrayList<Comment>();
+    	 
     	List<Comment> tmpFull = new ArrayList<Comment>();
     	List<Comment> tmpLink = new ArrayList<Comment>();
     	for (int i=0; i<input.length(); i++){
@@ -178,9 +188,14 @@ public class Comments {
 			parent 	=   Long.parseLong(JSONObject.valueToString(first_level.get("parent")));
 			level   = Integer.parseInt(JSONObject.valueToString(first_level.get("level")));
 //    		Сохранили все данные из первого уровня
-			JSONObject usernameJson = first_level.getJSONArray("username").getJSONObject(0);
-			username = JSONObject.valueToString(usernameJson.get("journal_url"));
-//			Сохранили название журнала из второго
+			Object tryUsername = first_level.get("username");
+			if (tryUsername.getClass().equals(JSONArray.class)){
+				JSONObject usernameJson = ((JSONArray) tryUsername).getJSONObject(0);
+				username = JSONObject.valueToString(usernameJson.get("journal_url"));
+				}
+			else 
+				username = "Anonymous";
+//			Сохранили название журнала из второго, если username не массив - значит автор анонимус
 			JSONArray actionsArray = first_level.getJSONArray("actions");
     		for (int j=0; j<actionsArray.length(); j++){
     			JSONObject tmp = actionsArray.getJSONObject(j);
@@ -190,27 +205,53 @@ public class Comments {
 //			Извлекли ссылку из внутреннего массива
     		tmpFull.add(new Comment(username, thread, parent, ctime, article, level));
     		tmpLink.add(new Comment(expand_url));
-    		System.out.println(tmpFull.size()-1 + " -- tmpFull "+tmpFull.get(tmpFull.size()-1));
-    		System.out.print("tmpLink "+tmpLink.get(tmpLink.size()-1));
-    		System.out.println(", collapsed: "+JSONObject.valueToString(first_level.get("collapsed")));
     		if (Integer.parseInt(JSONObject.valueToString(first_level.get("collapsed"))) == 1){
 //    			Текущая ветка скрыта, поднимаемся на 2 уровня выше
     			for (int j = 0; j < tmpFull.size()-3; j++)
-    				commentList.add(tmpFull.get(j));
-    			commentList.add(tmpLink.get(tmpLink.size()-3));
+    				result.add(tmpFull.get(j));
+    			result.add(tmpLink.get(tmpLink.size()-3));
     			tmpFull.clear();
     			tmpLink.clear();
     		} else
     		if (i==input.length()-1)
-    			commentList.addAll(tmpFull);
+    			result.addAll(tmpFull);
 //    			дошли до конца и не свернуто
     	}
-    }   
+//    	ЦИкл окончен, возвращаем результат
+    	return result;
+    }
     
+    void makeList(List<Comment> input) throws Exception{
+//    	рекурсивный метод, проверят есть ли в списке ссылки на треды, и раскрывает их, добавляя результат во временный список
+//    	если временный список не содержит ссылок, возвращает итоговый список    	
+    	List<Comment> tempList = new ArrayList<Comment>();
+    	Comment dummyComment = new Comment("www.google.com");
+//    	dummyComment индикатор ссылочного коммента
+    	int i=0;
+    	if (input.contains(dummyComment)){
+    		for (Comment aComment:input){
+    			if (aComment.equals(dummyComment)){
+    				i++;
+//    				нашли, вытягиваем из него список
+    				List<Comment> dummyList = new ArrayList<Comment>();
+    				dummyList = initList(retrieveJson(aComment.expand_url)); 
+    				tempList.addAll(dummyList);
+    			} else
+    				tempList.add(aComment);
+    		}
+    	}
+		System.out.println(i + " threads " + new Date().toString());    	
+//    	если временный список содержит ссылки, повторный прогон, если нет - сохраняем результат    	
+    	if (tempList.contains(dummyComment))
+    		makeList(tempList);
+    	else
+    		commentList = tempList;
+    }
+
     void Json2File(JSONArray initial) throws Exception{
     	List<String> localKeys = new ArrayList<String>(Arrays.asList("username,article,level,collapsed".split(",")));
-//        File out_file = new File("D:\\aovodov\\tmp\\20130509\\1398900"+number++ +".comments");
-    	File out_file = new File("D:\\aovodov\\tmp\\20130509\\1337569.comments");
+//        File out_file = new File("D:\\aovodov\\tmp\\20130510\\1398900"+number++ +".comments");
+    	File out_file = new File("D:\\aovodov\\tmp\\20130510\\diak-kuraev476958.json");
         PrintWriter out = new PrintWriter(out_file);
 
     	for (int i=0; i<initial.length(); i++){
@@ -239,13 +280,14 @@ public class Comments {
     
     public static void main(String[] args) throws Exception {
         Comments t = new Comments();
-        t.makeList(t.retrieveJson("http://dolboeb.livejournal.com/2510916.html?&format=light"));
+//        t.Json2File(t.retrieveJson("http://diak-kuraev.livejournal.com/476958.html?&format=light"));
+        t.makeList(t.initList(t.retrieveJson("http://diak-kuraev.livejournal.com/476958.html?&format=light")));
 //        for (int i=1; i<4; i++){
 //        	t.getFirstLevelList(t.retrieveJson("http://tema.livejournal.com/1398900.html?page="+i+"&format=light"));
 //        	System.out.println("http://tema.livejournal.com/1398900.html?page="+i+"&format=light");
 //        	System.out.println(new Date());	
 //        }
-    	File out_file = new File("D:\\aovodov\\tmp\\20130509\\dolboeb2510916.comments");
+    	File out_file = new File("D:\\aovodov\\tmp\\20130510\\diak-kuraev476958.comments");
         PrintWriter out = new PrintWriter(out_file);        
     	for (Comment aComment:t.commentList)
     		out.println(aComment);
