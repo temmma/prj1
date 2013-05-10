@@ -297,11 +297,11 @@ public class Comments {
     public static void main(String[] args) throws Exception {
         Comments t = new Comments();
         List<Comment> tmpList = new ArrayList<Comment>();
-        tmpList = t.initList(t.retrieveJson("http://tema.livejournal.com/1399439.html?format=light"));
+        tmpList = t.initList(t.retrieveJson("http://tema.livejournal.com/1397525.html?format=light"));
         t.commentList.addAll(tmpList);
         for (int i = 2; i <= t.pagesCount; i++) {
-			tmpList = t.initList(t.retrieveJson("http://tema.livejournal.com/1399439.html?page="+i+"&format=light"));
-			System.out.println("http://tema.livejournal.com/1399439.html?page="+i+"&format=light");
+			tmpList = t.initList(t.retrieveJson("http://tema.livejournal.com/1397525.html?page="+i+"&format=light"));
+			System.out.println("http://tema.livejournal.com/1397525.html?page="+i+"&format=light");
 			t.commentList.addAll(tmpList);
 		}
         t.makeList(t.commentList);
@@ -310,7 +310,7 @@ public class Comments {
 //        	System.out.println("http://tema.livejournal.com/1398900.html?page="+i+"&format=light");
 //        	System.out.println(new Date());	
 //        }
-       	File out_file = new File("D:\\aovodov\\tmp\\20130510\\tema1399439.comments");
+       	File out_file = new File("F:\\tmp\\20130510\\tema1397525.comments");
         PrintWriter out = new PrintWriter(out_file);
     	for (Comment aComment:t.commentList)
     		out.println(aComment);
