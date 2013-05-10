@@ -72,6 +72,7 @@ public class Comments {
     List<String> keys;
     List<String> linkList;
     int number = 0;
+    int pagesCount = -1;
     
     public Comments() throws Exception{
                keys = new ArrayList<String>(Arrays.asList("journal_url,thread,parent,ctime,article,level,leafclass".split(",")));
@@ -150,6 +151,9 @@ public class Comments {
         
         Document  		  doc = Jsoup.parse(html_text,"UTF-8");       
         Elements 	 comments = doc.getElementsByAttributeValue("id", "comments_json");
+//      Вычисляем количество страниц с комментариями
+        if (pagesCount == -1)
+        	pagesCount = Jsoup.parse(html_text).select("li.b-pager-page").size()/2;
         return new JSONArray(comments.html());
     }
 
@@ -251,7 +255,8 @@ public class Comments {
     				tempList.add(aComment);
     		}
     	}
-		System.out.println(i + " threads " + new Date().toString());    	
+		System.out.println(i + " threads " + new Date().toString());   
+		System.out.println(number++ + " - всего проходов.");
 //    	если временный список содержит ссылки, повторный прогон, если нет - сохраняем результат    	
     	if (tempList.contains(dummyComment))
     		makeList(tempList);
@@ -291,14 +296,21 @@ public class Comments {
     
     public static void main(String[] args) throws Exception {
         Comments t = new Comments();
-//        t.Json2File(t.retrieveJson("http://nl.livejournal.com/1227266.html?thread=26252034&format=light"));
-        t.makeList(t.initList(t.retrieveJson("http://nl.livejournal.com/1227266.html?format=light")));
+        List<Comment> tmpList = new ArrayList<Comment>();
+        tmpList = t.initList(t.retrieveJson("http://tema.livejournal.com/1399439.html?format=light"));
+        t.commentList.addAll(tmpList);
+        for (int i = 2; i <= t.pagesCount; i++) {
+			tmpList = t.initList(t.retrieveJson("http://tema.livejournal.com/1399439.html?page="+i+"&format=light"));
+			System.out.println("http://tema.livejournal.com/1399439.html?page="+i+"&format=light");
+			t.commentList.addAll(tmpList);
+		}
+        t.makeList(t.commentList);
 //        for (int i=1; i<4; i++){
 //        	t.getFirstLevelList(t.retrieveJson("http://tema.livejournal.com/1398900.html?page="+i+"&format=light"));
 //        	System.out.println("http://tema.livejournal.com/1398900.html?page="+i+"&format=light");
 //        	System.out.println(new Date());	
 //        }
-       	File out_file = new File("D:\\aovodov\\tmp\\20130510\\nl1227266.comment");
+       	File out_file = new File("D:\\aovodov\\tmp\\20130510\\tema1399439.comments");
         PrintWriter out = new PrintWriter(out_file);
     	for (Comment aComment:t.commentList)
     		out.println(aComment);
