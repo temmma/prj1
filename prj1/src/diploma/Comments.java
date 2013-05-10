@@ -66,6 +66,7 @@ class Comment{
 
 
 public class Comments {
+
 	
     List<Comment> commentList;
     List<String> keys;
@@ -76,6 +77,7 @@ public class Comments {
                keys = new ArrayList<String>(Arrays.asList("journal_url,thread,parent,ctime,article,level,leafclass".split(",")));
         commentList = new ArrayList<Comment>();
            linkList = new ArrayList<String>();
+//           otladka
     }
    
 //    /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ NEW BLOCK
@@ -206,14 +208,23 @@ public class Comments {
     		tmpFull.add(new Comment(username, thread, parent, ctime, article, level));
     		tmpLink.add(new Comment(expand_url));
     		if (Integer.parseInt(JSONObject.valueToString(first_level.get("collapsed"))) == 1){
-//    			Текущая ветка скрыта, поднимаемся на 2 уровня выше
-    			for (int j = 0; j < tmpFull.size()-3; j++)
-    				result.add(tmpFull.get(j));
-    			result.add(tmpLink.get(tmpLink.size()-3));
+//    			Текущая ветка скрыта, поднимаемся на до корня текущей ветки уровня выше
+//    			Проверяем, если корень - удаленный коммент, то на него нет ссылки ((
+//    			до ссылки на развернуть может быть как 2 (если это корень) так и 1 коммент
+    			if (tmpFull.size() == 2){
+    				result.add(tmpFull.get(0));
+    				if (!tmpLink.get(1).toString().equals("www.google.com"))
+    					result.add(tmpLink.get(1));
+    			} else if (tmpFull.size() > 2) {
+        			for (int j = 0; j < tmpFull.size()-3; j++)
+        				result.add(tmpFull.get(j));
+        			if (!tmpLink.get(tmpLink.size()-3).toString().equals("www.google.com"))
+        				result.add(tmpLink.get(tmpLink.size()-3));    				
+    			}
     			tmpFull.clear();
     			tmpLink.clear();
     		} else
-    		if (i==input.length()-1)
+    		if (i == input.length()-1)
     			result.addAll(tmpFull);
 //    			дошли до конца и не свернуто
     	}
@@ -251,7 +262,7 @@ public class Comments {
     void Json2File(JSONArray initial) throws Exception{
     	List<String> localKeys = new ArrayList<String>(Arrays.asList("username,article,level,collapsed".split(",")));
 //        File out_file = new File("D:\\aovodov\\tmp\\20130510\\1398900"+number++ +".comments");
-    	File out_file = new File("D:\\aovodov\\tmp\\20130510\\diak-kuraev476958.json");
+    	File out_file = new File("D:\\aovodov\\tmp\\20130510\\trololoshka.json");
         PrintWriter out = new PrintWriter(out_file);
 
     	for (int i=0; i<initial.length(); i++){
@@ -280,15 +291,15 @@ public class Comments {
     
     public static void main(String[] args) throws Exception {
         Comments t = new Comments();
-//        t.Json2File(t.retrieveJson("http://diak-kuraev.livejournal.com/476958.html?&format=light"));
-        t.makeList(t.initList(t.retrieveJson("http://diak-kuraev.livejournal.com/476958.html?&format=light")));
+//        t.Json2File(t.retrieveJson("http://nl.livejournal.com/1227266.html?thread=26252034&format=light"));
+        t.makeList(t.initList(t.retrieveJson("http://nl.livejournal.com/1227266.html?format=light")));
 //        for (int i=1; i<4; i++){
 //        	t.getFirstLevelList(t.retrieveJson("http://tema.livejournal.com/1398900.html?page="+i+"&format=light"));
 //        	System.out.println("http://tema.livejournal.com/1398900.html?page="+i+"&format=light");
 //        	System.out.println(new Date());	
 //        }
-    	File out_file = new File("D:\\aovodov\\tmp\\20130510\\diak-kuraev476958.comments");
-        PrintWriter out = new PrintWriter(out_file);        
+       	File out_file = new File("D:\\aovodov\\tmp\\20130510\\nl1227266.comment");
+        PrintWriter out = new PrintWriter(out_file);
     	for (Comment aComment:t.commentList)
     		out.println(aComment);
     	out.close();
