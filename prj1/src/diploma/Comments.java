@@ -101,6 +101,7 @@ public class Comments {
     	out.close();
     	System.out.println(commentList.size());
     	System.out.print(new Date());
+//    	test encoding
 	}
 
 	//    /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ NEW BLOCK
