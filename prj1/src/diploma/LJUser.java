@@ -267,7 +267,7 @@ public class LJUser {
 		String[] prepared = {text};
         String sql = "INSERT INTO prj1.posts(`username`, `text`, `post_id`) " +
         		"VALUES ('"+username+"',?,'"+post_id+"');";
-        dataBaseRequest(sql, prepared);
+        dataBaseRequest(sql, prepared); 
         
 	}
 	

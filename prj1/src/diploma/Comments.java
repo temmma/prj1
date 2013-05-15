@@ -124,7 +124,7 @@ public class Comments {
     	System.out.print(new Date());
 	}
 
-	//    /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ NEW BLOCK
+	//    /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ NEW BLOCK 
     void getFirstLevelList(JSONArray initial) throws Exception{
 //    	Принимает набор первоначальных комментариев, открывает все 1е уровни, грузит из них комменты
     	String href = "";
