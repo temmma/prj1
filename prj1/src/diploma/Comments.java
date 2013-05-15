@@ -74,11 +74,6 @@ public class Comments {
     String username;
     String postId;
     
-    public Comments(){
-        commentList = new ArrayList<Comment>();
-           linkList = new ArrayList<String>();
-    }
-
     public Comments(String username, String postId) throws Exception{
     	this.username = username;
     	this.postId = postId;
