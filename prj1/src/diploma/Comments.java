@@ -2,6 +2,10 @@ package diploma;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import org.apache.http.HttpEntity;
@@ -94,14 +98,30 @@ public class Comments {
     }
    
     private void writeList() throws Exception {
-       	File out_file = new File("F:\\tmp\\20130510\\"+username+postId+".comments");
-        PrintWriter out = new PrintWriter(out_file);
-    	for (Comment aComment:commentList)
-    		out.println(aComment);
-    	out.close();
+    	String sql = "";
+        Connection conn;
+        PreparedStatement DBStatement;
+        Properties connInfo;
+    	
+		connInfo = new Properties();
+        connInfo.put("characterEncoding","UTF8");
+        connInfo.put("user", "user");
+        connInfo.put("password", "password123");
+        conn = DriverManager.getConnection("jdbc:mysql://192.168.1.38/?", connInfo);
+    	for (Comment aComment:commentList){
+	        sql = "INSERT INTO prj1.comments(`ctime`, `article`, `username`, `thread`, `parent`, `level`) " +
+	        		"VALUES ('"+aComment.ctime+
+	        			  "',?"+ // aComment.article
+	        			  ",'"+username+
+	        			  "','"+aComment.thread+
+	        			  "','"+aComment.parent+
+	        			  "','"+aComment.level+"');";
+	        DBStatement = conn.prepareStatement(sql);
+	        DBStatement.setString(1, aComment.article);
+	        DBStatement.execute();
+    	}
     	System.out.println(commentList.size());
     	System.out.print(new Date());
-//    	test encoding
 	}
 
 	//    /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ NEW BLOCK

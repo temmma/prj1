@@ -128,17 +128,17 @@ public class LJUser {
 		createdDate = decodeDate("Created", content.text());
 		updatedDate = decodeDate("Updated", content.text());
 		
-		if (oldUpdate == null){								//записи нет
+		if (oldUpdate == null){								//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
 	        sql = "INSERT INTO prj1.ljusers(`name`, `created`, `updated`) " +
 	        		"VALUES ('"+username+"','"+dateFormat.format(createdDate)+"','"+dateFormat.format(updatedDate)+"');";
 	        obtainEntries(createdDate, updatedDate);
 	        result = dataBaseRequest(sql, null);
-		} else if (!oldUpdate.equals(updatedDate)){			//запись есть, но протухла
+		} else if (!oldUpdate.equals(updatedDate)){			//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			sql = "UPDATE prj1.ljusers SET `updated`='"+dateFormat.format(updatedDate)+"' " +
 					"WHERE `name` = '"+username+"';";
 			obtainEntries(oldUpdate, updatedDate);
 			result = dataBaseRequest(sql, null);
-		} else {											//запись есть и не протухла 
+		} else {											//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 
 			obtainEntries(updatedDate, updatedDate);
 			result = true;
 		}
@@ -194,7 +194,7 @@ public class LJUser {
         	int i=0;
         	StringBuilder time = new StringBuilder();
         	for (Element tt : rows) {
-        		if (i++%2 == 0) { 										//первая запись время 
+        		if (i++%2 == 0) { 										//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 
         			time.setLength(0);
         			time.append(tt.text());
         			if (time.toString().contains("a")) {
@@ -213,22 +213,22 @@ public class LJUser {
 						dateTime = new GregorianCalendar(1999, 0, 1, 0, 0, 0).getTime();
 					}
         		}
-        		else{													//вторая запись - заголовок, ссылка, количество комментов
+        		else{													//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         			post_id = tt.html();
         			title = "";
         			commentsCount = 0;
         			String[] buffer = tt.text().split(" ");
-        			if (buffer.length == 1) {							//заголовок одно слово, комментов нету
+        			if (buffer.length == 1) {							//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
         				noComments = true;
         				commentsCount = 0;
         				title = tt.select("a[href]").text();
-        			} else 	if (buffer.length > 1) { 					//если больше 1 слова 
-            			if (buffer[buffer.length-1].equals("reply")) { 	//всего один коммент 
+        			} else 	if (buffer.length > 1) { 					//пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 1 пїЅпїЅпїЅпїЅпїЅ 
+            			if (buffer[buffer.length-1].equals("reply")) { 	//пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 
             				commentsCount = 1;
             				title = tt.select("a[href]").text();
             			} else if (buffer[buffer.length-1].equals("replies")) {
             				try {
-            					commentsCount = Integer.parseInt(buffer[buffer.length-2]); //третье с конца слово - количество
+            					commentsCount = Integer.parseInt(buffer[buffer.length-2]); //пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             					title = tt.select("a[href]").text();
 							} catch (Exception e) {
 								commentsCount = 0;
@@ -247,8 +247,13 @@ public class LJUser {
         	        String[] prepared = {title};
         	        dataBaseRequest(sql, prepared);
         	        obtainPost(post_id);
-//        	        if (!noComments)
-//        	        getComments
+        	        if (!noComments){
+        	        	try {
+            	        	new Comments(username, post_id);
+						} catch (Exception e) {
+							System.out.println("problems with comments");
+						}        	        	
+        	        }
         		}
         	}
         }
@@ -268,7 +273,7 @@ public class LJUser {
 	
 	public static void main(String[] args) {
 		System.out.println(new Date());
-		String[] users = "drugoi ".split(" ");
+		String[] users = "mi3ch ".split(" ");
 		for (String s : users) 
 			new LJUser(s);
 		System.out.println(new Date());
