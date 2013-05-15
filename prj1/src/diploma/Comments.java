@@ -66,22 +66,49 @@ class Comment{
 
 
 public class Comments {
-
 	
     List<Comment> commentList;
-    List<String> keys;
     List<String> linkList;
     int number = 0;
     int pagesCount = -1;
+    String username;
+    String postId;
     
-    public Comments() throws Exception{
-               keys = new ArrayList<String>(Arrays.asList("journal_url,thread,parent,ctime,article,level,leafclass".split(",")));
+    public Comments(){
         commentList = new ArrayList<Comment>();
            linkList = new ArrayList<String>();
-//           otladka
+    }
+
+    public Comments(String username, String postId) throws Exception{
+    	this.username = username;
+    	this.postId = postId;
+        commentList = new ArrayList<Comment>();
+           linkList = new ArrayList<String>();
+           
+        List<Comment> tmpList = new ArrayList<Comment>();
+        tmpList = initList(retrieveJson("http://"+username+".livejournal.com/"+postId+".html?format=light"));
+        commentList.addAll(tmpList);
+        //pagesCount определяется в retrieveJson
+           for (int i = 2; i <= pagesCount; i++) {
+   			tmpList = initList(retrieveJson("http://"+username+".livejournal.com/"+postId+".html?page="+i+"&format=light"));
+   			System.out.println("http://"+username+".livejournal.com/"+postId+".html?page="+i+"&format=light");
+   			commentList.addAll(tmpList);
+   		}
+        makeList(commentList);
+        writeList();
     }
    
-//    /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ NEW BLOCK
+    private void writeList() throws Exception {
+       	File out_file = new File("F:\\tmp\\20130510\\"+username+postId+".comments");
+        PrintWriter out = new PrintWriter(out_file);
+    	for (Comment aComment:commentList)
+    		out.println(aComment);
+    	out.close();
+    	System.out.println(commentList.size());
+    	System.out.print(new Date());
+	}
+
+	//    /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ NEW BLOCK
     void getFirstLevelList(JSONArray initial) throws Exception{
 //    	Принимает набор первоначальных комментариев, открывает все 1е уровни, грузит из них комменты
     	String href = "";
@@ -139,9 +166,11 @@ public class Comments {
 //  \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ TRash BLOCK
     
     JSONArray retrieveJson(String url) throws Exception{
+    	
 //    	Возвращает массив с комментариями из страницы по адресу url
         HttpClient   httpclnt = new DefaultHttpClient();
-        HttpGet       httpget = new HttpGet(url);      
+        HttpGet       httpget = new HttpGet(url);
+        httpget.setHeader("User-Agent", "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)");
         HttpResponse httpresp = httpclnt.execute(httpget);
         HttpEntity     entity = httpresp.getEntity();
         String 		html_text = new String();
@@ -265,8 +294,6 @@ public class Comments {
     }
 
     void Json2File(JSONArray initial) throws Exception{
-    	List<String> localKeys = new ArrayList<String>(Arrays.asList("username,article,level,collapsed".split(",")));
-//        File out_file = new File("D:\\aovodov\\tmp\\20130510\\1398900"+number++ +".comments");
     	File out_file = new File("D:\\aovodov\\tmp\\20130510\\trololoshka.json");
         PrintWriter out = new PrintWriter(out_file);
 
@@ -295,27 +322,7 @@ public class Comments {
     }
     
     public static void main(String[] args) throws Exception {
-        Comments t = new Comments();
-        List<Comment> tmpList = new ArrayList<Comment>();
-        tmpList = t.initList(t.retrieveJson("http://tema.livejournal.com/1397525.html?format=light"));
-        t.commentList.addAll(tmpList);
-        for (int i = 2; i <= t.pagesCount; i++) {
-			tmpList = t.initList(t.retrieveJson("http://tema.livejournal.com/1397525.html?page="+i+"&format=light"));
-			System.out.println("http://tema.livejournal.com/1397525.html?page="+i+"&format=light");
-			t.commentList.addAll(tmpList);
-		}
-        t.makeList(t.commentList);
-//        for (int i=1; i<4; i++){
-//        	t.getFirstLevelList(t.retrieveJson("http://tema.livejournal.com/1398900.html?page="+i+"&format=light"));
-//        	System.out.println("http://tema.livejournal.com/1398900.html?page="+i+"&format=light");
-//        	System.out.println(new Date());	
-//        }
-       	File out_file = new File("F:\\tmp\\20130510\\tema1397525.comments");
-        PrintWriter out = new PrintWriter(out_file);
-    	for (Comment aComment:t.commentList)
-    		out.println(aComment);
-    	out.close();
-    	System.out.println(t.commentList.size());
-    	System.out.print(new Date());
+        Comments t = new Comments("mi3ch","2302043");
     }
+    
 }

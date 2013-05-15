@@ -181,6 +181,7 @@ public class LJUser {
         Date dateTime = null;
         int commentsCount;
         String post_id;
+        boolean noComments = false;
         
         for (Element t : dates) {
         	strDay="";
@@ -217,7 +218,8 @@ public class LJUser {
         			title = "";
         			commentsCount = 0;
         			String[] buffer = tt.text().split(" ");
-        			if (buffer.length == 1) {							//заголовок одно слово, комментов нету 
+        			if (buffer.length == 1) {							//заголовок одно слово, комментов нету
+        				noComments = true;
         				commentsCount = 0;
         				title = tt.select("a[href]").text();
         			} else 	if (buffer.length > 1) { 					//если больше 1 слова 
@@ -245,6 +247,8 @@ public class LJUser {
         	        String[] prepared = {title};
         	        dataBaseRequest(sql, prepared);
         	        obtainPost(post_id);
+//        	        if (!noComments)
+//        	        getComments
         		}
         	}
         }
