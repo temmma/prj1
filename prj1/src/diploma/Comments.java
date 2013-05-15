@@ -182,7 +182,7 @@ public class Comments {
 //  \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ TRash BLOCK
     
     JSONArray retrieveJson(String url) throws Exception{
-    	
+    	System.out.println(url);
 //    	Возвращает массив с комментариями из страницы по адресу url
         HttpClient   httpclnt = new DefaultHttpClient();
         HttpGet       httpget = new HttpGet(url);
@@ -338,7 +338,7 @@ public class Comments {
     }
     
     public static void main(String[] args) throws Exception {
-        Comments t = new Comments("mi3ch","2302043");
+    	Comments t = new Comments("chillyred","216950");
     }
     
 }
