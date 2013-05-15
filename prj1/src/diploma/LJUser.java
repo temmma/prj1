@@ -128,17 +128,17 @@ public class LJUser {
 		createdDate = decodeDate("Created", content.text());
 		updatedDate = decodeDate("Updated", content.text());
 		
-		if (oldUpdate == null){								//Р·Р°РїРёСЃРё РЅРµС‚
+		if (oldUpdate == null){								//записи нет
 	        sql = "INSERT INTO prj1.ljusers(`name`, `created`, `updated`) " +
 	        		"VALUES ('"+username+"','"+dateFormat.format(createdDate)+"','"+dateFormat.format(updatedDate)+"');";
 	        obtainEntries(createdDate, updatedDate);
 	        result = dataBaseRequest(sql, null);
-		} else if (!oldUpdate.equals(updatedDate)){			//Р·Р°РїРёСЃСЊ РµСЃС‚СЊ, РЅРѕ РїСЂРѕС‚СѓС…Р»Р°
+		} else if (!oldUpdate.equals(updatedDate)){			//запись есть, но протухла
 			sql = "UPDATE prj1.ljusers SET `updated`='"+dateFormat.format(updatedDate)+"' " +
 					"WHERE `name` = '"+username+"';";
 			obtainEntries(oldUpdate, updatedDate);
 			result = dataBaseRequest(sql, null);
-		} else {											//Р·Р°РїРёСЃСЊ РµСЃС‚СЊ Рё РЅРµ РїСЂРѕС‚СѓС…Р»Р°
+		} else {											//запись есть и не протухла 
 			obtainEntries(updatedDate, updatedDate);
 			result = true;
 		}
@@ -193,7 +193,7 @@ public class LJUser {
         	int i=0;
         	StringBuilder time = new StringBuilder();
         	for (Element tt : rows) {
-        		if (i++%2 == 0) { 										//РїРµСЂРІР°СЏ Р·Р°РїРёСЃСЊ РІСЂРµРјСЏ
+        		if (i++%2 == 0) { 										//первая запись время 
         			time.setLength(0);
         			time.append(tt.text());
         			if (time.toString().contains("a")) {
@@ -212,21 +212,21 @@ public class LJUser {
 						dateTime = new GregorianCalendar(1999, 0, 1, 0, 0, 0).getTime();
 					}
         		}
-        		else{													//РІС‚РѕСЂР°СЏ Р·Р°РїРёСЃСЊ - Р·Р°РіРѕР»РѕРІРѕРє, СЃСЃС‹Р»РєР°, РєРѕР»РёС‡РµСЃС‚РІРѕ РєРѕРјРјРµРЅС‚РѕРІ
+        		else{													//вторая запись - заголовок, ссылка, количество комментов
         			post_id = tt.html();
         			title = "";
         			commentsCount = 0;
         			String[] buffer = tt.text().split(" ");
-        			if (buffer.length == 1) {							//Р·Р°РіРѕР»РѕРІРѕРє РѕРґРЅРѕ СЃР»РѕРІРѕ, РєРѕРјРјРµРЅС‚РѕРІ РЅРµС‚Сѓ
+        			if (buffer.length == 1) {							//заголовок одно слово, комментов нету 
         				commentsCount = 0;
         				title = tt.select("a[href]").text();
-        			} else 	if (buffer.length > 1) { 					//РµСЃР»Рё Р±РѕР»СЊС€Рµ 1 СЃР»РѕРІР°
-            			if (buffer[buffer.length-1].equals("reply")) { 	//РІСЃРµРіРѕ РѕРґРёРЅ РєРѕРјРјРµРЅС‚
+        			} else 	if (buffer.length > 1) { 					//если больше 1 слова 
+            			if (buffer[buffer.length-1].equals("reply")) { 	//всего один коммент 
             				commentsCount = 1;
             				title = tt.select("a[href]").text();
             			} else if (buffer[buffer.length-1].equals("replies")) {
             				try {
-            					commentsCount = Integer.parseInt(buffer[buffer.length-2]); //С‚СЂРµС‚СЊРµ СЃ РєРѕРЅС†Р° СЃР»РѕРІРѕ - РєРѕР»РёС‡РµСЃС‚РІРѕ
+            					commentsCount = Integer.parseInt(buffer[buffer.length-2]); //третье с конца слово - количество
             					title = tt.select("a[href]").text();
 							} catch (Exception e) {
 								commentsCount = 0;
