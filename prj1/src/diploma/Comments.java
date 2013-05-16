@@ -1,6 +1,7 @@
 package diploma;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -10,6 +11,8 @@ import java.util.*;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.ParseException;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -181,14 +184,23 @@ public class Comments {
     }
 //  \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ TRash BLOCK
     
-    JSONArray retrieveJson(String url) throws Exception{
+    JSONArray retrieveJson(String url) throws IOException {
     	System.out.println(url);
 //    	Возвращает массив с комментариями из страницы по адресу url
         HttpClient   httpclnt = new DefaultHttpClient();
         HttpGet       httpget = new HttpGet(url);
         httpget.setHeader("User-Agent", "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)");
-        HttpResponse httpresp = httpclnt.execute(httpget);
-        HttpEntity     entity = httpresp.getEntity();
+        HttpResponse httpresp;
+        HttpEntity     entity = null;
+		try {
+			httpresp = httpclnt.execute(httpget);
+			entity = httpresp.getEntity();			
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
         String 		html_text = new String();
         if (entity != null)
             html_text = EntityUtils.toString(entity, "UTF-8");

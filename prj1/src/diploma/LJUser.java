@@ -32,7 +32,7 @@ public class LJUser {
     private Properties connInfo;
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
 	
-	public LJUser(String username){
+	public LJUser(String username) throws InterruptedException{
 		this.username = username;
 		dataBaseConnection();
 		checkProfile();
@@ -69,12 +69,14 @@ public class LJUser {
 		return result;
 	}
 
-	public Document obtainHtmlText(String get){
+	public Document obtainHtmlText(String get) {
 		Document doc = null;
 		HttpHost targetHost = new HttpHost(username+".livejournal.com", 80, "http");
 		DefaultHttpClient httpclient = new DefaultHttpClient();
 		BasicHttpContext localcontext = new BasicHttpContext();
 		HttpGet httpget = new HttpGet(get);
+		httpget.setHeader("User-Agent", "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)");
+		System.out.println(targetHost+get);
 		String htmlText = "";
 		HttpResponse httpresp;
 		try {
@@ -87,6 +89,7 @@ public class LJUser {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+			return null;
 		}
 		return doc;
 	}
@@ -108,7 +111,7 @@ public class LJUser {
 		return result;
 	}
 
-	public boolean checkProfile(){
+	public boolean checkProfile() throws InterruptedException{
 		boolean result = false;
 		String sql = "SELECT * FROM prj1.ljusers " +
 				"WHERE `name` = '"+username+"';";
@@ -122,8 +125,13 @@ public class LJUser {
 		} catch (SQLException e) {
 			System.out.println("Unable to get ResultSet from query "+sql);
 			e.printStackTrace();
-		}        
-		Document doc = obtainHtmlText("/profile");
+		}
+        Document doc = obtainHtmlText("/profile");        
+        while(doc == null){
+        	System.out.println("Перерыв 10 сек.");
+    		Thread.sleep(10000);
+        	doc = obtainHtmlText("/profile");
+        }
         Elements content = doc.getElementsByClass("b-account-level");
 		createdDate = decodeDate("Created", content.text());
 		updatedDate = decodeDate("Updated", content.text());
@@ -145,7 +153,7 @@ public class LJUser {
 		return result;
 	}
 	
-	public void obtainEntries(Date startDate, Date endDate){
+	public void obtainEntries(Date startDate, Date endDate) throws InterruptedException{
 		GregorianCalendar clndr = new GregorianCalendar();
 		clndr.setTime(endDate);
 		int aYear = clndr.get(GregorianCalendar.YEAR);
@@ -163,11 +171,16 @@ public class LJUser {
 		System.out.println("Username "+username+" records was inserted at "+new Date());
 	}
 	
-	private void obtainMonthEntries(int year, int month){
+	private void obtainMonthEntries(int year, int month) throws InterruptedException{
 		String strYear = String.valueOf(year);
 		String strMonth = String.valueOf(month);
 		if (strMonth.length()<2) strMonth = "0"+strMonth;
-		Document doc = obtainHtmlText("/"+strYear+"/"+strMonth+"/?format=light");	
+		Document doc = obtainHtmlText("/"+strYear+"/"+strMonth+"/?format=light");
+        while(doc == null){
+        	System.out.println("Перерыв 10 сек.");
+    		Thread.sleep(10000);
+    		doc = obtainHtmlText("/"+strYear+"/"+strMonth+"/?format=light");
+        }
         Elements table = doc.select("dl");
         Elements dates = table.select("dt");
         Elements tables = table.select("table");
@@ -261,8 +274,13 @@ public class LJUser {
 		
 	}
 	
-	public void obtainPost(String post_id){
+	public void obtainPost(String post_id) throws InterruptedException{
 		Document doc = obtainHtmlText("/"+post_id+".html?format=light");
+        while(doc == null){
+        	System.out.println("Перерыв 10 сек.");
+    		Thread.sleep(10000);
+    		doc = obtainHtmlText("/"+post_id+".html?format=light");
+        }
 		String text = doc.getElementsByClass("b-singlepost-body").text();
 		System.out.println(new Date() + " - "+ text);
 		String[] prepared = {text};
@@ -272,9 +290,9 @@ public class LJUser {
         
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		System.out.println(new Date());
-		String[] users = "choodo7, choranger, chudovis4e, chulasov, chumakin, chuppakabr, chuss92, chuvila, chuzhoy007, chzhungahora, cinematographua, citymos, ciuffolotto, cka3o4nik, claritaudoc, claudaften, clemensvyxo, clr666, clubdialog, cm101, cocaj, cochneff, codeby, codykb, coffeetabwood, cogito11, colemanso, colfari, colliganafyk, coltsovmixail, comaks, comestai, commisarjewski, componavt, compositive, comrade11289, concluder, conduc, conel, conev, confetka, conseeker, conservatore, const67, constansia1366, consuelaad, contrstream, coolyagin, copelandizuj, copysujet, corinkov, corobin, cortari, cortas, cortik565, corvuscorax1988, cotelea, couldhell, coveks, cptn77, crane1, crassusx, cravigliacq, crazyfly, crimson69, crimsonalter, crocket, crolev, csjoker, ctepasharik, ctpeko3a2001, cuamckuykot, cubitor, cuhb, cujlbep, culhertxed, cv, cvoi, cyaraeo, ".split(", ");
+		String[] users = "chumakin, chuppakabr, chuss92, chuvila, chuzhoy007, chzhungahora, cinematographua, citymos, ciuffolotto, cka3o4nik, claritaudoc, claudaften, clemensvyxo, clr666, clubdialog, cm101, cocaj, cochneff, codeby, codykb, coffeetabwood, cogito11, colemanso, colfari, colliganafyk, coltsovmixail, comaks, comestai, commisarjewski, componavt, compositive, comrade11289, concluder, conduc, conel, conev, confetka, conseeker, conservatore, const67, constansia1366, consuelaad, contrstream, coolyagin, copelandizuj, copysujet, corinkov, corobin, cortari, cortas, cortik565, corvuscorax1988, cotelea, couldhell, coveks, cptn77, crane1, crassusx, cravigliacq, crazyfly, crimson69, crimsonalter, crocket, crolev, csjoker, ctepasharik, ctpeko3a2001, cuamckuykot, cubitor, cuhb, cujlbep, culhertxed, cv, cvoi, cyaraeo, ".split(", ");
 		for (String s : users) 
 			new LJUser(s);
 		System.out.println(new Date());
