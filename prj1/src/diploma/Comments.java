@@ -314,7 +314,7 @@ public class Comments {
     	}
 		System.out.println(i + " threads " + new Date().toString());   
 		System.out.println(number++ + " - всего проходов.");
-//    	если временный список содержит ссылки, повторный прогон, если нет - сохраняем результат    	
+//    	если временный список содержит ссылки, повторный прогон,  если нет - сохраняем результат    	
     	if (tempList.contains(dummyComment))
     		makeList(tempList);
     	else
