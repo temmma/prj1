@@ -128,7 +128,7 @@ public class LJUser {
 		}
         Document doc = obtainHtmlText("/profile");        
         while(doc == null){
-        	System.out.println("ΠΠµΡ€ΠµΡ€Ρ‹Π² 10 ΡΠµΠΊ.");
+        	System.out.println("Οεπεπϋβ 10 ρεκ.");
     		Thread.sleep(10000);
         	doc = obtainHtmlText("/profile");
         }
@@ -177,7 +177,7 @@ public class LJUser {
 		if (strMonth.length()<2) strMonth = "0"+strMonth;
 		Document doc = obtainHtmlText("/"+strYear+"/"+strMonth+"/?format=light");
         while(doc == null){
-        	System.out.println("ΠΠµΡ€ΠµΡ€Ρ‹Π² 10 ΡΠµΠΊ.");
+        	System.out.println("Οεπεπϋβ 10 ρεκ.");
     		Thread.sleep(10000);
     		doc = obtainHtmlText("/"+strYear+"/"+strMonth+"/?format=light");
         }
@@ -292,7 +292,7 @@ public class LJUser {
 	
 	public static void main(String[] args) throws InterruptedException {
 		System.out.println(new Date());
-		String[] users = "000000000000000, 000alabama, 00765, 007agentessa, 01cent, 01iz, 05kami, 06430832523, 08svs80, 0hra, 0medved, 0s0b1st, 0x0badc0de, 1001friends, 100gnomov, 100hzjugin, 108fm, 13zuzanna13, 15e601, 1696277, 1924r, 19dima47, 1ekceu4, 1kasanie, 1lioning, 1tokyo, 1victor, 200q20v, 20watcher10, 20yug81, 2314x, 232111, 23lizards, 2f0ru, 2pac1989, 314sako, 314zdetc1977, 32lashed, 3axap4enko, 3sofiter1, 444anna, 464782, 4lexey, 4mcsim, 4monitoring, 4trudel, ".split(", ");
+		String[] users = "1lioning, 1tokyo, 1victor, 200q20v, 20watcher10, 20yug81, 2314x, 232111, 23lizards, 2f0ru, 2pac1989, 314sako, 314zdetc1977, 32lashed, 3axap4enko, 3sofiter1, 444anna, 464782, 4lexey, 4mcsim, 4monitoring, 4trudel, ".split(", ");
 		for (String s : users) 
 			new LJUser(s);
 		System.out.println(new Date());

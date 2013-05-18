@@ -123,7 +123,7 @@ public class Comments {
 	        DBStatement.setString(1, aComment.article);
 	        DBStatement.execute();
     	}
-    	System.out.println(commentList.size());
+    	System.out.println(commentList.size() + " - comment(s) at all.");
     	System.out.print(new Date());
 	}
 
@@ -312,8 +312,8 @@ public class Comments {
     				tempList.add(aComment);
     		}
     	}
-		System.out.println(i + " threads " + new Date().toString());   
-		System.out.println(number++ + " - всего проходов.");
+    	else
+    		tempList = input;
 //    	если временный список содержит ссылки, повторный прогон,  если нет - сохраняем результат    	
     	if (tempList.contains(dummyComment))
     		makeList(tempList);
