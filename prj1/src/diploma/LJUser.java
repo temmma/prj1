@@ -45,7 +45,7 @@ public class LJUser {
         connInfo.put("user", "user");
         connInfo.put("password", "password123");
         try {
-        	conn = DriverManager.getConnection("jdbc:mysql://192.168.1.38/?", connInfo);
+        	conn = DriverManager.getConnection("jdbc:mysql://dbhost/?", connInfo);
         	result = true;
 		} catch (SQLException e) {
 			System.out.println("Unable to connect to database!\n"+e);
@@ -277,7 +277,7 @@ public class LJUser {
 	public void obtainPost(String post_id) throws InterruptedException{
 		Document doc = obtainHtmlText("/"+post_id+".html?format=light");
         while(doc == null){
-        	System.out.println("ΠΠµΡ€ΠµΡ€Ρ‹Π² 10 ΡΠµΠΊ.");
+        	System.out.println("Οεπεπϋβ 10 ρεκ.");
     		Thread.sleep(10000);
     		doc = obtainHtmlText("/"+post_id+".html?format=light");
         }
@@ -292,7 +292,7 @@ public class LJUser {
 	
 	public static void main(String[] args) throws InterruptedException {
 		System.out.println(new Date());
-		String[] users = "chuppakabr, chuss92, chuvila, chuzhoy007, chzhungahora, cinematographua, citymos, ciuffolotto, cka3o4nik, claritaudoc, claudaften, clemensvyxo, clr666, clubdialog, cm101, cocaj, cochneff, codeby, codykb, coffeetabwood, cogito11, colemanso, colfari, colliganafyk, coltsovmixail, comaks, comestai, commisarjewski, componavt, compositive, comrade11289, concluder, conduc, conel, conev, confetka, conseeker, conservatore, const67, constansia1366, consuelaad, contrstream, coolyagin, copelandizuj, copysujet, corinkov, corobin, cortari, cortas, cortik565, corvuscorax1988, cotelea, couldhell, coveks, cptn77, crane1, crassusx, cravigliacq, crazyfly, crimson69, crimsonalter, crocket, crolev, csjoker, ctepasharik, ctpeko3a2001, cuamckuykot, cubitor, cuhb, cujlbep, culhertxed, cv, cvoi, cyaraeo, ".split(", ");
+		String[] users = "000000000000000, 000alabama, 00765, 007agentessa, 01cent, 01iz, 05kami, 06430832523, 08svs80, 0hra, 0medved, 0s0b1st, 0x0badc0de, 1001friends, 100gnomov, 100hzjugin, 108fm, 13zuzanna13, 15e601, 1696277, 1924r, 19dima47, 1ekceu4, 1kasanie, 1lioning, 1tokyo, 1victor, 200q20v, 20watcher10, 20yug81, 2314x, 232111, 23lizards, 2f0ru, 2pac1989, 314sako, 314zdetc1977, 32lashed, 3axap4enko, 3sofiter1, 444anna, 464782, 4lexey, 4mcsim, 4monitoring, 4trudel, ".split(", ");
 		for (String s : users) 
 			new LJUser(s);
 		System.out.println(new Date());

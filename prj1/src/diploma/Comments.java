@@ -110,7 +110,7 @@ public class Comments {
         connInfo.put("characterEncoding","UTF8");
         connInfo.put("user", "user");
         connInfo.put("password", "password123");
-        conn = DriverManager.getConnection("jdbc:mysql://192.168.1.38/?", connInfo);
+        conn = DriverManager.getConnection("jdbc:mysql://dbhost/?", connInfo);
     	for (Comment aComment:commentList){
 	        sql = "INSERT INTO prj1.comments(`ctime`, `article`, `username`, `thread`, `parent`, `level`) " +
 	        		"VALUES ('"+aComment.ctime+
