@@ -292,9 +292,10 @@ public class LJUser {
 	
 	public static void main(String[] args) throws InterruptedException {
 		System.out.println(new Date());
-		String[] users = "1lioning, 1tokyo, 1victor, 200q20v, 20watcher10, 20yug81, 2314x, 232111, 23lizards, 2f0ru, 2pac1989, 314sako, 314zdetc1977, 32lashed, 3axap4enko, 3sofiter1, 444anna, 464782, 4lexey, 4mcsim, 4monitoring, 4trudel, ".split(", ");
-		for (String s : users) 
-			new LJUser(s);
+//		String[] users = "4mcsim, 4monitoring, 4trudel, ".split(", ");
+		for (String s : args)
+			if (!s.contains("_"))
+				new LJUser(s);
 		System.out.println(new Date());
 		
 	}
